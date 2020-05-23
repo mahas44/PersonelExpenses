@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/transaction.dart';
-import 'package:intl/intl.dart';
-import 'package:intl/date_symbol_data_local.dart';
+import './transaction_item.dart';
 
 class TransactionList extends StatelessWidget {
   final List<Transaction> transactions;
@@ -10,7 +9,7 @@ class TransactionList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    initializeDateFormatting('tr');
+    print("build() TransactionList");
     return transactions.isEmpty
         ? LayoutBuilder(builder: (ctx, constarints) {
             return Column(
@@ -19,7 +18,7 @@ class TransactionList extends StatelessWidget {
                   "No transaction added yet !",
                   style: Theme.of(context).textTheme.title,
                 ),
-                SizedBox(
+                const SizedBox(
                   height: 10,
                 ),
                 Container(
@@ -32,44 +31,25 @@ class TransactionList extends StatelessWidget {
               ],
             );
           })
-        : ListView.builder(
-            itemBuilder: (ctx, index) {
-              return Card(
-                margin: EdgeInsets.symmetric(vertical: 8, horizontal: 5),
-                elevation: 10,
-                child: ListTile(
-                  leading: CircleAvatar(
-                    radius: 30,
-                    child: Padding(
-                      padding: EdgeInsets.all(5),
-                      child: FittedBox(
-                        child: Text("\$${transactions[index].amount}"),
-                      ),
-                    ),
-                  ),
-                  title: Text(
-                    transactions[index].title,
-                    style: Theme.of(context).textTheme.title,
-                  ),
-                  subtitle: Text(
-                    DateFormat.yMMMEd('tr_TR').format(transactions[index].date),
-                  ),
-                  trailing: MediaQuery.of(context).size.width > 460
-                      ? FlatButton.icon(
-                          onPressed: () => deleteTx(transactions[index].id),
-                          icon: Icon(Icons.delete),
-                          label: Text("Delete"),
-                          textColor: Theme.of(context).errorColor,
-                        )
-                      : IconButton(
-                          icon: Icon(Icons.delete),
-                          color: Theme.of(context).errorColor,
-                          onPressed: () => deleteTx(transactions[index].id),
-                        ),
-                ),
-              );
-            },
-            itemCount: transactions.length,
-          );
+        // key'i kullanmak için Listview.builderı kullanmadık.(Listview.builder()da key kullanırken bug oluyor)
+        : ListView(
+            children: transactions
+                .map((tx) => TransactionItem(
+                      key: ValueKey(tx.id),
+                      transaction: tx,
+                      deleteTx: deleteTx,
+                    ))
+                .toList());
+      // Listede 50 veya 100'den fazla item varsa listeyi bu şekilde oluşturarak performansı arttırabiliriz.
+    // : ListView.builder(
+    //     itemBuilder: (ctx, index) {
+    //       return TransactionItem(
+    //         key: ValueKey(transactions[index].id),
+    //         transaction: transactions[index],
+    //         deleteTx: deleteTx,
+    //       );
+    //     },
+    //     itemCount: transactions.length,
+    //   );
   }
 }

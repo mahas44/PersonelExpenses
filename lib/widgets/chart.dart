@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:intl/date_symbol_data_local.dart';
+
 import './chart_bar.dart';
 import "../models/transaction.dart";
-import 'package:intl/intl.dart';
 
 class Chart extends StatelessWidget {
   final List<Transaction> recentTransactions;
 
-  Chart(this.recentTransactions);
+  Chart(this.recentTransactions) {
+    print("Constructur Chart");
+  }
 
   List<Map<String, Object>> get groupedTransactionValues {
     return List.generate(7, (index) {
@@ -23,7 +27,7 @@ class Chart extends StatelessWidget {
         }
       }
       return {
-        "day": DateFormat.E().format(weekDay).substring(0, 1),
+        "day": DateFormat.E("tr_TR").format(weekDay).substring(0, 1),
         "amount": totalSum,
       };
     }).reversed.toList();
@@ -37,6 +41,8 @@ class Chart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    print("build() Chart");
+    initializeDateFormatting('tr');
     return Card(
       elevation: 6,
       margin: EdgeInsets.all(20),
